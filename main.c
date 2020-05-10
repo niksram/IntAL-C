@@ -12,4 +12,5 @@ int main()
     printf("diff %s\n",intal_diff(c1,c2));
     printf("wholeMul %s\n",intal_multiply(c1,c2));
     printf("fib %s\n",intal_fibonacci(460));
+    printf("fact %s\n",intal_factorial(50));
 }

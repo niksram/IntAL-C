@@ -359,3 +359,16 @@ char* intal_fibonacci(unsigned int n)
         return s3;
     }    
 }
+
+char* intal_factorial(unsigned int n)
+{
+    char* s=(char*)malloc(100*sizeof(char));
+    strcpy(s,"1\0");
+    for(int i=2;i<=n;i++)
+    {
+        char* temp=s;
+        s=single_multiply(s,i,0);
+        free(temp);
+    }
+    return s;
+}
