@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "intal.h"
+#include <limits.h>
 
 typedef struct Node
 {
@@ -132,7 +133,7 @@ char *intstore_to_string(IntStore *istore)
         node = node->less;
         len++;
     }
-    char *s = (char *)malloc((len+1) * sizeof(char));
+    char *s = (char *)malloc((len + 1) * sizeof(char));
     if (len != 0)
     {
         for (int i = 0; i < len; i++)
@@ -210,17 +211,17 @@ int intal_compare(char *intal1, char *intal2)
     {
         Node *n1 = istore1->msd;
         Node *n2 = istore2->msd;
-        int val=0;
+        int val = 0;
         while (n1 && n2)
         {
             if (n1->ele > n2->ele)
             {
-                val=1;
+                val = 1;
                 break;
             }
             else if (n1->ele < n2->ele)
             {
-                val=-1;
+                val = -1;
                 break;
             }
             n1 = n1->less;
@@ -249,7 +250,7 @@ char *intal_diff(char *intal1, char *intal2)
     }
     else
     {
-        char *s;
+        char *s = (char *)malloc(2 * sizeof(char));
         strcpy(s, "0\0");
         return s;
     }
@@ -311,7 +312,7 @@ char *single_multiply(char *intal1, int n, int offset)
 char *intal_multiply(char *intal1, char *intal2)
 {
     IntStore *istore2 = string_to_intstore(intal2);
-    char *product = malloc(10001 * sizeof(char));
+    char *product = (char *)malloc(2 * sizeof(char));
     strcpy(product, "0\0");
     int count = 0;
     Node *n2 = istore2->lsd;
@@ -324,19 +325,33 @@ char *intal_multiply(char *intal1, char *intal2)
         free(temp);
         n2 = n2->great;
     }
+    free_intstore(istore2);
     return product;
 }
 
 char *intal_mod(char *intal1, char *intal2)
 {
+    long int c = 0;
     while (intal_compare(intal1, intal2) != -1)
     {
-        int len=strlen(intal1)-strlen(intal2)-1;
-        if(len<0)
-            len=0;
-        char* temp=single_multiply(intal2,1,len);
+        int len = strlen(intal1) - strlen(intal2) - 1;
+        if (len < 0)
+            len = 0;
+        char *temp = single_multiply(intal2, 1, len);
+        char *temp2 = intal1;
         intal1 = intal_diff(intal1, temp);
         free(temp);
+        if (c > 0)
+            free(temp2);
+        c++;
+        if (c == INT_MAX)
+            c = 1;
+    }
+    if (c == 0)
+    {
+        char *s = (char *)malloc((strlen(intal1) + 1) * sizeof(char));
+        strcpy(s, intal1);
+        return s;
     }
     return intal1;
 }
@@ -389,33 +404,33 @@ char *intal_gcd(char *intal1, char *intal2)
 {
     int cmp = intal_compare(intal1, intal2);
     int len;
-    int c=0;
-    while (cmp)
+    long int c = 0;
+    while (cmp != 0)
     {
-        char* temp3;
+        char *temp3;
         if (cmp == 1)
         {
-            len=strlen(intal1)-strlen(intal2)-1;
-            if(len<0)
-                len=0;
-            temp3=single_multiply(intal2,1,len);
-            intal1=intal_diff(intal1,temp3);
+            len = strlen(intal1) - strlen(intal2) - 1;
+            if (len < 0)
+                len = 0;
+            temp3 = single_multiply(intal2, 1, len);
+            intal1 = intal_diff(intal1, temp3);
         }
         else if (cmp == -1)
         {
-            len=strlen(intal2)-strlen(intal1)-1;
-            if(len<0)
-                len=0;
-            temp3=single_multiply(intal1,1,len);
-            intal2=intal_diff(intal2,temp3);
+            len = strlen(intal2) - strlen(intal1) - 1;
+            if (len < 0)
+                len = 0;
+            temp3 = single_multiply(intal1, 1, len);
+            intal2 = intal_diff(intal2, temp3);
         }
         free(temp3);
-        c=1;
+        c++;
         cmp = intal_compare(intal1, intal2);
     }
-    if(c==0)
+    if (c == 0)
     {
-        char *s = (char *)malloc(10001 * sizeof(char));
+        char *s = (char *)malloc((strlen(intal1) + 1) * sizeof(char));
         strcpy(s, intal1);
         return s;
     }
@@ -423,9 +438,66 @@ char *intal_gcd(char *intal1, char *intal2)
     {
         return intal1;
     }
-    
-    return (intal_gcd(intal1, intal2));
 }
+
+int intal_max(char **arr, int n)
+{
+    int max_ind = 0;
+    for (int i = 1; i < n; i++)
+    {
+        if (intal_compare(arr[i], arr[max_ind]) == 1)
+            max_ind = i;
+    }
+    return max_ind;
+}
+
+int intal_min(char **arr, int n)
+{
+    int min_ind = 0;
+    for (int i = 1; i < n; i++)
+    {
+        if (intal_compare(arr[i], arr[min_ind]) == -1)
+            min_ind = i;
+    }
+    return min_ind;
+}
+
+int intal_search(char **arr, int n, char *key)
+{
+    for (int i = 0; i < n; i++)
+    {
+        if (!intal_compare(arr[i], key))
+            return i;
+    }
+}
+
+int intal_binsearch(char **arr, int n, char* key)
+{
+    int lower=0;
+    int higher=n-1;
+    while(higher>lower)
+    {
+        int mid=(lower+higher)/2;
+        if(intal_compare(arr[mid],key)==1)
+        {
+            lower=mid+1;
+        }
+        else if(intal_compare(arr[mid],key)==-1)
+        {
+            higher=mid-1;
+        }
+        else
+        {
+            return mid;
+        }        
+    }
+    return -1;
+}
+
+// int intal_binsearch(char **arr, int n, char* key)
+// {
+
+// }
 
 // char* intal_pow(char* intal1, char* intal2)
 // {
