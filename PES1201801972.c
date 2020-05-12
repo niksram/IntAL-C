@@ -132,7 +132,7 @@ char *intstore_to_string(IntStore *istore)
         node = node->less;
         len++;
     }
-    char *s = malloc(101 * sizeof(char));
+    char *s = (char *)malloc((len+1) * sizeof(char));
     if (len != 0)
     {
         for (int i = 0; i < len; i++)
@@ -179,12 +179,12 @@ char *intal_add(char *intal1, char *intal2)
         node2 = node2->great;
         insert_intstore(sumstore, new, -1);
     }
-    if(carry)
+    if (carry)
     {
         Node *new = create_node(carry % 10);
-        insert_intstore(sumstore, new, -1);        
+        insert_intstore(sumstore, new, -1);
     }
-    Node* n=sumstore->lsd;
+    Node *n = sumstore->lsd;
     char *c = intstore_to_string(sumstore);
     free_intstore(sumstore);
     free_intstore(istore1);
@@ -210,18 +210,25 @@ int intal_compare(char *intal1, char *intal2)
     {
         Node *n1 = istore1->msd;
         Node *n2 = istore2->msd;
+        int val=0;
         while (n1 && n2)
         {
             if (n1->ele > n2->ele)
-                return 1;
+            {
+                val=1;
+                break;
+            }
             else if (n1->ele < n2->ele)
-                return -1;
+            {
+                val=-1;
+                break;
+            }
             n1 = n1->less;
             n2 = n2->less;
         }
         free_intstore(istore1);
         free_intstore(istore2);
-        return 0;
+        return val;
     }
 }
 
@@ -304,7 +311,7 @@ char *single_multiply(char *intal1, int n, int offset)
 char *intal_multiply(char *intal1, char *intal2)
 {
     IntStore *istore2 = string_to_intstore(intal2);
-    char *product = malloc(100 * sizeof(char));
+    char *product = malloc(10001 * sizeof(char));
     strcpy(product, "0\0");
     int count = 0;
     Node *n2 = istore2->lsd;
@@ -324,51 +331,112 @@ char *intal_mod(char *intal1, char *intal2)
 {
     while (intal_compare(intal1, intal2) != -1)
     {
-        intal1 = intal_diff(intal1, intal2);
+        int len=strlen(intal1)-strlen(intal2)-1;
+        if(len<0)
+            len=0;
+        char* temp=single_multiply(intal2,1,len);
+        intal1 = intal_diff(intal1, temp);
+        free(temp);
     }
     return intal1;
 }
 
-char* intal_fibonacci(unsigned int n)
+char *intal_fibonacci(unsigned int n)
 {
-    char *s1=(char*)malloc(100*sizeof(char));
-    char *s2=(char*)malloc(100*sizeof(char));
-    char* s3;
-    strcpy(s1,"0\0");
-    strcpy(s2,"1\0");
-    if(n==1)
+    char *s1 = (char *)malloc(2 * sizeof(char));
+    char *s2 = (char *)malloc(2 * sizeof(char));
+    char *s3;
+    strcpy(s1, "0\0");
+    strcpy(s2, "1\0");
+    if (n == 0)
     {
         free(s2);
         return s1;
     }
-    else if(n==2)
+    else if (n == 1)
     {
         free(s1);
         return s2;
     }
     else
     {
-        for(int i=3;i<=n;i++)
+        for (int i = 2; i <= n; i++)
         {
-            s3=intal_add(s1,s2);
+            s3 = intal_add(s1, s2);
             free(s1);
-            s1=s2;
-            s2=s3;
+            s1 = s2;
+            s2 = s3;
         }
         free(s1);
         return s3;
-    }    
+    }
 }
 
-char* intal_factorial(unsigned int n)
+char *intal_factorial(unsigned int n)
 {
-    char* s=(char*)malloc(100*sizeof(char));
-    strcpy(s,"1\0");
-    for(int i=2;i<=n;i++)
+    char *s = (char *)malloc(2 * sizeof(char));
+    strcpy(s, "1\0");
+    for (int i = 2; i <= n; i++)
     {
-        char* temp=s;
-        s=single_multiply(s,i,0);
+        char *temp = s;
+        s = single_multiply(s, i, 0);
         free(temp);
     }
     return s;
 }
+
+char *intal_gcd(char *intal1, char *intal2)
+{
+    int cmp = intal_compare(intal1, intal2);
+    int len;
+    int c=0;
+    while (cmp)
+    {
+        char* temp3;
+        if (cmp == 1)
+        {
+            len=strlen(intal1)-strlen(intal2)-1;
+            if(len<0)
+                len=0;
+            temp3=single_multiply(intal2,1,len);
+            intal1=intal_diff(intal1,temp3);
+        }
+        else if (cmp == -1)
+        {
+            len=strlen(intal2)-strlen(intal1)-1;
+            if(len<0)
+                len=0;
+            temp3=single_multiply(intal1,1,len);
+            intal2=intal_diff(intal2,temp3);
+        }
+        free(temp3);
+        c=1;
+        cmp = intal_compare(intal1, intal2);
+    }
+    if(c==0)
+    {
+        char *s = (char *)malloc(10001 * sizeof(char));
+        strcpy(s, intal1);
+        return s;
+    }
+    else
+    {
+        return intal1;
+    }
+    
+    return (intal_gcd(intal1, intal2));
+}
+
+// char* intal_pow(char* intal1, char* intal2)
+// {
+//     IntStore *istore2=string_to_intstore(intal2);
+//     Node* n2=istore2->lsd;
+//     int place=1;
+//     while(n2)
+//     {
+//         for(int i=0;i<n;i++)
+//         {
+
+//         }
+//     }
+// }
