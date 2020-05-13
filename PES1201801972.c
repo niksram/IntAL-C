@@ -28,6 +28,7 @@ static char *single_multiply(char *, int, int);
 static void mergesort(char **, int, int);
 static void merge_sortedhalves(char **, int, int, int);
 static char *rec_intal_bincoeff(unsigned int, unsigned int, char ***);
+static char *looper(char *intal1, int, long int);
 
 IntStore *init_intstore()
 {
@@ -593,4 +594,49 @@ char *rec_intal_bincoeff(unsigned int n, unsigned int k, char ***cube)
     cpy = (char *)malloc((strlen(result) + 1) * sizeof(char));
     strcpy(cpy, result);
     return (cpy);
+}
+
+char *intal_pow(char *intal1, char *intal2)
+{
+    long int len = strlen(intal2);
+    char *power = (char *)malloc(2 * sizeof(char));
+    char *temp, *temp2;
+    strcpy(power, "1\0");
+    for (int i = 0; i < len; i++)
+    {
+        temp2 = looper(intal1, (int)(intal2[len - 1 - i]) - (int)('0'), i);
+        temp = power;
+        power = intal_multiply(temp2, power);
+        free(temp);
+        free(temp2);
+    }
+    return power;
+}
+
+char *looper(char *intal1, int val, long int place)
+{
+    char *res = (char *)malloc(2 * sizeof(char));
+    char *temp, *temp2;
+    strcpy(res, "1\0");
+    if (place == 0)
+    {
+        for (int i = 0; i < val; i++)
+        {
+            temp = res;
+            res = intal_multiply(intal1, res);
+            free(temp);
+        }
+    }
+    else
+    {
+        temp2 = looper(intal1, val, place - 1);
+        for (int i = 0; i < 10; i++)
+        {
+            temp = res;
+            res = intal_multiply(temp2, res);
+            free(temp);
+        }
+        free(temp2);
+    }
+    return (res);
 }
