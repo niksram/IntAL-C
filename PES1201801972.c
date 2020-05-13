@@ -25,6 +25,9 @@ static char *intstore_to_string(IntStore *);
 static void free_intstore(IntStore *);
 static int len_instore(IntStore *);
 static char *single_multiply(char *, int, int);
+static void mergesort(char **, int, int);
+static void merge_sortedhalves(char **, int, int, int);
+static char *rec_intal_bincoeff(unsigned int, unsigned int, char ***);
 
 IntStore *init_intstore()
 {
@@ -136,7 +139,7 @@ char *intstore_to_string(IntStore *istore)
     char *s = (char *)malloc((len + 1) * sizeof(char));
     if (len != 0)
     {
-        for (int i = 0; i < len; i++)
+        for (int i = 0; i < len && nodecopy; i++)
         {
             s[i] = (char)(nodecopy->ele + (int)('0'));
             nodecopy = nodecopy->less;
@@ -169,14 +172,14 @@ char *intal_add(char *intal1, char *intal2)
     while (node1)
     {
         Node *new = create_node((node1->ele + carry) % 10);
-        carry = 0;
+        carry = (node1->ele + carry) / 10;
         node1 = node1->great;
         insert_intstore(sumstore, new, -1);
     }
     while (node2)
     {
         Node *new = create_node((node2->ele + carry) % 10);
-        carry = 0;
+        carry = (node2->ele + carry) / 10;
         node2 = node2->great;
         insert_intstore(sumstore, new, -1);
     }
@@ -471,44 +474,123 @@ int intal_search(char **arr, int n, char *key)
     }
 }
 
-int intal_binsearch(char **arr, int n, char* key)
+int intal_binsearch(char **arr, int n, char *key)
 {
-    int lower=0;
-    int higher=n-1;
-    while(higher>lower)
+    int lower = 0;
+    int higher = n - 1;
+    while (higher >= lower)
     {
-        int mid=(lower+higher)/2;
-        if(intal_compare(arr[mid],key)==1)
+        int mid = (lower + higher) / 2;
+        if (intal_compare(arr[mid], key) == -1)
         {
-            lower=mid+1;
+            lower = mid + 1;
         }
-        else if(intal_compare(arr[mid],key)==-1)
+        else if (intal_compare(arr[mid], key) == 1)
         {
-            higher=mid-1;
+            higher = mid - 1;
         }
         else
         {
             return mid;
-        }        
+        }
     }
     return -1;
 }
 
-// int intal_binsearch(char **arr, int n, char* key)
-// {
+void intal_sort(char **arr, int n)
+{
+    mergesort(arr, 0, n - 1);
+}
 
-// }
+void mergesort(char **a, int start, int end)
+{
+    if (start - end)
+    {
+        mergesort(a, start, (start + end) / 2);
+        mergesort(a, (start + end) / 2 + 1, end);
+        merge_sortedhalves(a, start, (start + end) / 2 + 1, end);
+    }
+}
 
-// char* intal_pow(char* intal1, char* intal2)
-// {
-//     IntStore *istore2=string_to_intstore(intal2);
-//     Node* n2=istore2->lsd;
-//     int place=1;
-//     while(n2)
-//     {
-//         for(int i=0;i<n;i++)
-//         {
+void merge_sortedhalves(char **a, int start, int mid, int end)
+{
+    int i = start;
+    int j = mid;
+    int pos = 0;
+    char *b[end - start + 1];
+    while (i < mid && j <= end)
+    {
+        if (intal_compare(a[i], a[j]) == -1)
+        {
+            b[pos++] = a[i++];
+        }
+        else
+        {
+            b[pos++] = a[j++];
+        }
+    }
+    while (i < mid)
+    {
+        b[pos++] = a[i++];
+    }
+    while (j < pos)
+    {
+        b[pos++] = a[j++];
+    }
+    for (int i = 0; i < pos; i++)
+    {
+        a[start + i] = b[i];
+    }
+}
 
-//         }
-//     }
-// }
+char *intal_bincoeff(unsigned int n, unsigned int k)
+{
+    char ***cube;
+    cube = (char ***)malloc((n + 1) * sizeof(char **));
+    for (unsigned int i = 0; i <= n; i++)
+    {
+        cube[i] = (char **)malloc((k + 1) * sizeof(char *));
+        for (unsigned int j = 0; j <= k; j++)
+            cube[i][j] = NULL;
+    }
+    char *res = rec_intal_bincoeff(n, k, cube);
+    for (unsigned int i = 0; i <= n; i++)
+    {
+        for (unsigned int j = 0; j <= k; j++)
+            if (cube[i][j])
+                free(cube[i][j]);
+        free(cube[i]);
+    }
+    free(cube);
+    return (res);
+}
+
+char *rec_intal_bincoeff(unsigned int n, unsigned int k, char ***cube)
+{
+    char *result, *cpy;
+    if (cube[n][k] != NULL)
+    {
+        result = cube[n][k];
+    }
+    else
+    {
+        if (n == k || k == 0)
+        {
+            result = (char *)malloc(2 * sizeof(char));
+            strcpy(result, "1\0");
+            cube[n][k] = result;
+        }
+        else
+        {
+            char *first = rec_intal_bincoeff(n - 1, k - 1, cube);
+            char *second = rec_intal_bincoeff(n - 1, k, cube);
+            result = intal_add(first, second);
+            free(first);
+            free(second);
+            cube[n][k] = result;
+        }
+    }
+    cpy = (char *)malloc((strlen(result) + 1) * sizeof(char));
+    strcpy(cpy, result);
+    return (cpy);
+}
