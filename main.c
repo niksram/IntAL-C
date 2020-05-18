@@ -40,7 +40,7 @@ int main()
     char* gcd=intal_gcd(c1,c2);
     printf("gcd %s\n",gcd);
     free(gcd);
-    char* bin=intal_bincoeff(100,20);
+    char* bin=intal_bincoeff(100,50);
     printf("bin %s\n",bin);
     free(bin);
     printf("max %d\n",intal_max(arr,5));
