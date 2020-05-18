@@ -4,32 +4,32 @@
 #include "intal.h"
 #include <limits.h>
 
-typedef struct Node
+typedef struct Node //node structure of double linked list
 {
     int ele;
-    struct Node *great;
-    struct Node *less;
+    struct Node *great;//successive digit
+    struct Node *less;//predecessive digit
 } Node;
 
-typedef struct IntStore
+typedef struct IntStore //head structure of doubly linked list
 {
-    Node *msd;
-    Node *lsd;
+    Node *msd;//most significant digit
+    Node *lsd;//least significant digit
 } IntStore;
 
-static IntStore *init_intstore();
-static Node *create_node(int);
-static void insert_intstore(IntStore *, Node *, int);
-static IntStore *string_to_intstore(const char *);
-static char *intstore_to_string(IntStore *);
-static void free_intstore(IntStore *);
-static int len_instore(IntStore *);
-static char *single_multiply(const char *, int, int);
-static void mergesort(char **, int, int);
-static void merge_sortedhalves(char **, int, int, int);
-static char *rec_intal_bincoeff(unsigned int, unsigned int, char ***);
-static char *string_intal_pow(const char *intal1, const char *intal2);
-static char *looper(const char *intal1, int, long int);
+static IntStore *init_intstore(); //initialise DLL
+static Node *create_node(int);//create node for DLL
+static void insert_intstore(IntStore *, Node *, int);//insert node into DLL
+static IntStore *string_to_intstore(const char *);//Intal string to DLL
+static char *intstore_to_string(IntStore *);//DLL to Intal string
+static void free_intstore(IntStore *);//freeing DLL
+static int len_instore(IntStore *);//len of intal number
+static char *single_multiply(const char *, int, int);//multiply an intal_string with single digit integer
+static void mergesort(char **, int, int);//mergesort for recursion
+static void merge_sortedhalves(char **, int, int, int);//merging function for mergesort
+static char *rec_intal_bincoeff(unsigned int, unsigned int, char ***);//recursive function for binary coefficient
+static char *string_intal_pow(const char *intal1, const char *intal2);//old power function
+static char *looper(const char *intal1, int, long int);//loop function fo old power function
 // static void mallcopy(char* dest,char* source);
 
 // void mallcopy(char* dest,char* source)
@@ -37,7 +37,7 @@ static char *looper(const char *intal1, int, long int);
 //     char* dest=(char*)malloc((strlen)sizeof(char));
 // }
 
-IntStore *init_intstore()
+IntStore *init_intstore()//initialise the DLL
 {
     IntStore *istore = (IntStore *)malloc(sizeof(IntStore));
     istore->msd = NULL;
@@ -45,11 +45,11 @@ IntStore *init_intstore()
     return istore;
 }
 
-int len_instore(IntStore *istore)
+int len_instore(IntStore *istore)//to fing length of Intal number
 {
     Node *node = istore->lsd;
     int len = 0;
-    while (node)
+    while (node)//traversing DLL to find the length
     {
         node = node->great;
         len++;
@@ -57,7 +57,7 @@ int len_instore(IntStore *istore)
     return len;
 }
 
-void free_intstore(IntStore *istore)
+void free_intstore(IntStore *istore)//freeing the DLL
 {
     Node *node = istore->lsd;
     while (node)
@@ -69,7 +69,7 @@ void free_intstore(IntStore *istore)
     free(istore);
 }
 
-Node *create_node(int val)
+Node *create_node(int val)//creating a node for a digit
 {
     Node *node = (Node *)malloc(sizeof(Node));
     node->ele = val;
@@ -78,28 +78,28 @@ Node *create_node(int val)
     return node;
 }
 
-void insert_intstore(IntStore *istore, Node *node, int pos)
+void insert_intstore(IntStore *istore, Node *node, int pos)//insert a digit node into IntStore DLL
 {
     if (istore->lsd == NULL && istore->msd == NULL)
     {
         istore->lsd = node;
         istore->msd = node;
     }
-    else if (pos == -1)
+    else if (pos == -1)//if pos==-1, insert at msd side
     {
         node->less = istore->msd;
         istore->msd = node;
         if (node->less)
             node->less->great = node;
     }
-    else if (pos == 0)
+    else if (pos == 0)//if pos==0, insert at lsd side
     {
         node->great = istore->lsd;
         istore->lsd = node;
         if (node->great)
             node->great->less = node;
     }
-    else
+    else//insert at nth position
     {
         Node *move = istore->lsd;
         for (int i = 1; i < pos; i++)
@@ -110,19 +110,19 @@ void insert_intstore(IntStore *istore, Node *node, int pos)
         node->less = move;
         move->great->less = node;
         move->great = node;
-    }
+    }//wrong inputs of pos not taken care of, as its called only internally
 }
 
-IntStore *string_to_intstore(const char *intal1)
+IntStore *string_to_intstore(const char *intal1)//convert string to DLL
 {
     int len = strlen(intal1);
     IntStore *istore = init_intstore();
     int j = 0;
-    while (j < len && intal1[j] == '0')
+    while (j < len && intal1[j] == '0')//stripping zeros on the msb side
     {
         j++;
     }
-    for (int i = j; i < len; i++)
+    for (int i = j; i < len; i++)//inserting nodes
     {
         Node *node = create_node((int)(intal1[i]) - (int)('0'));
         insert_intstore(istore, node, 0);
@@ -130,16 +130,16 @@ IntStore *string_to_intstore(const char *intal1)
     return istore;
 }
 
-char *intstore_to_string(IntStore *istore)
+char *intstore_to_string(IntStore *istore)//convert DLL to string
 {
     Node *node = istore->msd;
     while (node && node->ele == 0)
     {
         node = node->less;
-    }
+    }//stripping zeros if present (most unlikely)
     Node *nodecopy = node;
     int len = 0;
-    while (node)
+    while (node)//determining length of the string
     {
         node = node->less;
         len++;
@@ -154,7 +154,7 @@ char *intstore_to_string(IntStore *istore)
         }
         s[len] = '\0';
     }
-    else
+    else//if len=0, then 0 must be stored
     {
         strcpy(s, "0\0");
     }
@@ -163,35 +163,35 @@ char *intstore_to_string(IntStore *istore)
 
 char *intal_add(const char *intal1, const char *intal2)
 {
-    IntStore *istore1 = string_to_intstore(intal1);
+    IntStore *istore1 = string_to_intstore(intal1);//generate IntStore DLL's
     IntStore *istore2 = string_to_intstore(intal2);
-    IntStore *sumstore = init_intstore();
+    IntStore *sumstore = init_intstore();//for storing sum
     int carry = 0;
     Node *node1 = istore1->lsd;
     Node *node2 = istore2->lsd;
-    while (node1 && node2)
+    while (node1 && node2)//while both node exists from lsd side
     {
-        Node *new = create_node((node1->ele + node2->ele + carry) % 10);
-        carry = (node1->ele + node2->ele + carry) / 10;
+        Node *new = create_node((node1->ele + node2->ele + carry) % 10);//single digit at its position
+        carry = (node1->ele + node2->ele + carry) / 10;//carry
         node1 = node1->great;
         node2 = node2->great;
         insert_intstore(sumstore, new, -1);
     }
-    while (node1)
+    while (node1)//when only node1 exists(when intal1 is longer than intal2)
     {
         Node *new = create_node((node1->ele + carry) % 10);
         carry = (node1->ele + carry) / 10;
         node1 = node1->great;
         insert_intstore(sumstore, new, -1);
     }
-    while (node2)
+    while (node2)//when only node2 exists(when intal2 is longer than intal1)
     {
         Node *new = create_node((node2->ele + carry) % 10);
         carry = (node2->ele + carry) / 10;
         node2 = node2->great;
         insert_intstore(sumstore, new, -1);
     }
-    if (carry)
+    if (carry)// if carry still resides
     {
         Node *new = create_node(carry % 10);
         insert_intstore(sumstore, new, -1);
@@ -210,7 +210,7 @@ int intal_compare(const char *intal1, const char *intal2)
     IntStore *istore2 = string_to_intstore(intal2);
     int l1 = len_instore(istore1);
     int l2 = len_instore(istore2);
-    if (l1 != l2)
+    if (l1 != l2)//if there exists a difference in the length, then result can be concluded immediately
     {
         free_intstore(istore1);
         free_intstore(istore2);
@@ -219,12 +219,12 @@ int intal_compare(const char *intal1, const char *intal2)
         else
             return -1;
     }
-    else
+    else//if length is same for both the strings
     {
         Node *n1 = istore1->msd;
         Node *n2 = istore2->msd;
         int val = 0;
-        while (n1 && n2)
+        while (n1 && n2)//traverse from msd side
         {
             if (n1->ele > n2->ele)
             {
@@ -238,7 +238,7 @@ int intal_compare(const char *intal1, const char *intal2)
             }
             n1 = n1->less;
             n2 = n2->less;
-        }
+        }//if both are equal
         free_intstore(istore1);
         free_intstore(istore2);
         return val;
@@ -249,7 +249,7 @@ char *intal_diff(const char *intal1, const char *intal2)
 {
     IntStore *istore1;
     IntStore *istore2;
-    int cmp = intal_compare(intal1, intal2);
+    int cmp = intal_compare(intal1, intal2);//to decide which string is greater
     if (cmp == 1)
     {
         istore1 = string_to_intstore(intal1);
@@ -260,7 +260,7 @@ char *intal_diff(const char *intal1, const char *intal2)
         istore2 = string_to_intstore(intal1);
         istore1 = string_to_intstore(intal2);
     }
-    else
+    else//if both are equal
     {
         char *s = (char *)malloc(2 * sizeof(char));
         strcpy(s, "0\0");
@@ -268,19 +268,19 @@ char *intal_diff(const char *intal1, const char *intal2)
     }
     Node *n1 = istore1->lsd;
     Node *n2 = istore2->lsd;
-    while (n1 && n2)
+    while (n1 && n2)//difference is calculated and stored in istore2
     {
         n1->ele -= n2->ele;
         if (n1->ele < 0)
         {
             n1->ele += 10;
-            if (n1->great)
+            if (n1->great)//borrow from successor
                 n1->great->ele--;
         }
         n1 = n1->great;
         n2 = n2->great;
     }
-    while (n1 && n1->ele < 0)
+    while (n1 && n1->ele < 0)//to neutralise the negative borrows stored in the DLL
     {
         n1->ele += 10;
         if (n1->great)
@@ -293,25 +293,25 @@ char *intal_diff(const char *intal1, const char *intal2)
     return s;
 }
 
-char *single_multiply(const char *intal1, int n, int offset)
+char *single_multiply(const char *intal1, int n, int offset)//multiply a intal string with 1 integer digit, offset is a parameter used to multiply by 10^offset
 {
     IntStore *istore1 = string_to_intstore(intal1);
     Node *n1 = istore1->lsd;
     long int carry = 0;
-    while (n1)
+    while (n1)//similar to addition, the carry is passed on
     {
         int old_ele = n1->ele;
         n1->ele = (old_ele * n + carry) % 10;
         carry = (old_ele * n + carry) / 10;
         n1 = n1->great;
     }
-    while (carry)
+    while (carry)//adding nodes, till carry prevails
     {
         Node *node = create_node(carry % 10);
         insert_intstore(istore1, node, -1);
         carry /= 10;
     }
-    for (int i = 0; i < offset; i++)
+    for (int i = 0; i < offset; i++)//inserting zeros, offset enables result=result*(10^offset), used in mod to increase efficiency
     {
         Node *node = create_node(0);
         insert_intstore(istore1, node, 0);
@@ -321,7 +321,7 @@ char *single_multiply(const char *intal1, int n, int offset)
     return s;
 }
 
-char *intal_multiply(const char *intal1, const char *intal2)
+char *intal_multiply(const char *intal1, const char *intal2)//multiply  2 intal strings
 {
     IntStore *istore2 = string_to_intstore(intal2);
     char *product = (char *)malloc(2 * sizeof(char));
@@ -418,12 +418,12 @@ char *intal_gcd(const char *intal1, const char *intal2)
     char *temp;
     while (intal_compare(i1, zero) == 1 && intal_compare(i2, zero) == 1)
     {
-        if (intal_compare(i1, i2) == 1)
+        if (intal_compare(i1, i2) >= 0)
         {
             temp = i1;
             i1 = intal_mod(i1, i2);
         }
-        else if (intal_compare(i2, i1) == 1)
+        else
         {
             temp = i2;
             i2 = intal_mod(i2, i1);
@@ -623,51 +623,6 @@ char *intal_pow(const char *intal1, unsigned int n)
     }
 }
 
-char *string_intal_pow(const char *intal1, const char *intal2)
-{
-    long int len = strlen(intal2);
-    char *power = (char *)malloc(2 * sizeof(char));
-    char *temp, *temp2;
-    strcpy(power, "1\0");
-    for (int i = 0; i < len; i++)
-    {
-        temp2 = looper(intal1, (int)(intal2[len - 1 - i]) - (int)('0'), i);
-        temp = power;
-        power = intal_multiply(temp2, power);
-        free(temp);
-        free(temp2);
-    }
-    return power;
-}
-
-char *looper(const char *intal1, int val, long int place)
-{
-    char *res = (char *)malloc(2 * sizeof(char));
-    char *temp, *temp2;
-    strcpy(res, "1\0");
-    if (place == 0)
-    {
-        for (int i = 0; i < val; i++)
-        {
-            temp = res;
-            res = intal_multiply(intal1, res);
-            free(temp);
-        }
-    }
-    else
-    {
-        temp2 = looper(intal1, val, place - 1);
-        for (int i = 0; i < 10; i++)
-        {
-            temp = res;
-            res = intal_multiply(temp2, res);
-            free(temp);
-        }
-        free(temp2);
-    }
-    return (res);
-}
-
 char *coin_row_problem(char **arr, int n)
 {
     if (n == 1)
@@ -707,3 +662,48 @@ char *coin_row_problem(char **arr, int n)
         return val2;
     }
 }
+
+//char *string_intal_pow(const char *intal1, const char *intal2)
+// {
+//     long int len = strlen(intal2);
+//     char *power = (char *)malloc(2 * sizeof(char));
+//     char *temp, *temp2;
+//     strcpy(power, "1\0");
+//     for (int i = 0; i < len; i++)
+//     {
+//         temp2 = looper(intal1, (int)(intal2[len - 1 - i]) - (int)('0'), i);
+//         temp = power;
+//         power = intal_multiply(temp2, power);
+//         free(temp);
+//         free(temp2);
+//     }
+//     return power;
+// }
+
+// char *looper(const char *intal1, int val, long int place)
+// {
+//     char *res = (char *)malloc(2 * sizeof(char));
+//     char *temp, *temp2;
+//     strcpy(res, "1\0");
+//     if (place == 0)
+//     {
+//         for (int i = 0; i < val; i++)
+//         {
+//             temp = res;
+//             res = intal_multiply(intal1, res);
+//             free(temp);
+//         }
+//     }
+//     else
+//     {
+//         temp2 = looper(intal1, val, place - 1);
+//         for (int i = 0; i < 10; i++)
+//         {
+//             temp = res;
+//             res = intal_multiply(temp2, res);
+//             free(temp);
+//         }
+//         free(temp2);
+//     }
+//     return (res);
+// }
