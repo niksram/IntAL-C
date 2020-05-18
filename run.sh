@@ -1,3 +1,3 @@
 make
-./a.out
+time ./a.out
 make clean

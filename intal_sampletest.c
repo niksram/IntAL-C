@@ -79,7 +79,6 @@ int main(int argc, char const *argv[]) {
 		}
 		free(result1);
 	}
-
 	result1 = intal_mod("978", "5");
 	if(!result1) {
 		printf("Test intal_mod FAILED.\n");
