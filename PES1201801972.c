@@ -30,8 +30,6 @@ static char *single_multiply(const char *, int, int);                  //multipl
 static void mergesort(char **, int, int);                              //mergesort for recursion
 static void merge_sortedhalves(char **, int, int, int);                //merging function for mergesort
 static char *rec_intal_bincoeff(unsigned int, unsigned int, char ***); //recursive function for binary coefficient
-static char *string_intal_pow(const char *intal1, const char *intal2); //old power function
-static char *looper(const char *intal1, int, long int);                //loop function fo old power function
 static char* mallcopy(const char* source);
 
 static char* mallcopy(const char* source)//mallocs memory and copies string to it
@@ -201,7 +199,6 @@ char *intal_add(const char *intal1, const char *intal2)
         Node *new = create_node(carry % 10);
         insert_intstore(sumstore, new, -1);
     }
-    Node *n = sumstore->lsd;
     char *c = intstore_to_string(sumstore);
     free_intstore(sumstore);
     free_intstore(istore1);
