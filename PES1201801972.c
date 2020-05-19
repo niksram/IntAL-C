@@ -4,6 +4,8 @@
 #include "intal.h"
 #include <limits.h>
 
+//code tested on valgrind, no memory leaks found
+
 typedef struct Node //node structure of double linked list
 {
     int ele;
@@ -30,12 +32,14 @@ static void merge_sortedhalves(char **, int, int, int);                //merging
 static char *rec_intal_bincoeff(unsigned int, unsigned int, char ***); //recursive function for binary coefficient
 static char *string_intal_pow(const char *intal1, const char *intal2); //old power function
 static char *looper(const char *intal1, int, long int);                //loop function fo old power function
-// static void mallcopy(char* dest,char* source);
+static char* mallcopy(const char* source);
 
-// void mallcopy(char* dest,char* source)
-// {
-//     char* dest=(char*)malloc((strlen)sizeof(char));
-// }
+static char* mallcopy(const char* source)//mallocs memory and copies string to it
+{
+    char* dest=(char*)malloc((strlen(source)+1)*sizeof(char));
+    strcpy(dest,source);
+    return dest;
+}
 
 IntStore *init_intstore() //initialise the DLL
 {
@@ -110,7 +114,7 @@ void insert_intstore(IntStore *istore, Node *node, int pos) //insert a digit nod
         node->less = move;
         move->great->less = node;
         move->great = node;
-    } //wrong inputs of pos not taken care of, as its called only internally
+    } //wrong inputs of pos not taken care of, as this function is called only internally
 }
 
 IntStore *string_to_intstore(const char *intal1) //convert string to DLL
@@ -144,9 +148,10 @@ char *intstore_to_string(IntStore *istore) //convert DLL to string
         node = node->less;
         len++;
     }
-    char *s = (char *)malloc((len + 1) * sizeof(char));
+    char* s;
     if (len != 0)
     {
+        s = (char *)malloc((len + 1) * sizeof(char));
         for (int i = 0; i < len && nodecopy; i++)
         {
             s[i] = (char)(nodecopy->ele + (int)('0'));
@@ -156,7 +161,7 @@ char *intstore_to_string(IntStore *istore) //convert DLL to string
     }
     else //if len=0, then 0 must be stored
     {
-        strcpy(s, "0\0");
+        s=mallcopy("0\0");
     }
     return (s);
 }
@@ -262,9 +267,7 @@ char *intal_diff(const char *intal1, const char *intal2)
     }
     else //if both are equal
     {
-        char *s = (char *)malloc(2 * sizeof(char));
-        strcpy(s, "0\0");
-        return s;
+        return mallcopy("0\0");
     }
     Node *n1 = istore1->lsd;
     Node *n2 = istore2->lsd;
@@ -324,8 +327,7 @@ char *single_multiply(const char *intal1, int n, int offset) //multiply a intal 
 char *intal_multiply(const char *intal1, const char *intal2) //multiply  2 intal strings
 {
     IntStore *istore2 = string_to_intstore(intal2);
-    char *product = (char *)malloc(2 * sizeof(char)); //the pointer which shall store the final result
-    strcpy(product, "0\0");                           //initialised to store 0
+    char *product = mallcopy("0\0"); //this pointer stores the product, initialised to 0                           
     long int count = 0;
     Node *n2 = istore2->lsd;
     while (n2)
@@ -373,11 +375,9 @@ char *intal_mod(const char *intal1, const char *intal2)
 
 char *intal_fibonacci(unsigned int n)
 {
-    char *s1 = (char *)malloc(2 * sizeof(char));
-    char *s2 = (char *)malloc(2 * sizeof(char));
+    char *s1 = mallcopy("0\0");
+    char *s2 = mallcopy("1\0");
     char *s3;
-    strcpy(s1, "0\0");
-    strcpy(s2, "1\0");
     if (n == 0)
     {
         free(s2);
@@ -404,8 +404,7 @@ char *intal_fibonacci(unsigned int n)
 
 char *intal_factorial(unsigned int n) // calls the power function
 {
-    char *s = (char *)malloc(2 * sizeof(char));
-    strcpy(s, "1\0");
+    char* s=mallcopy("1\0");
     for (int i = 2; i <= n; i++)
     {
         char *temp = s;
@@ -417,12 +416,9 @@ char *intal_factorial(unsigned int n) // calls the power function
 
 char *intal_gcd(const char *intal1, const char *intal2)
 {
-    char *i1 = (char *)malloc((strlen(intal1) + 1) * sizeof(char)); //intal1 and intal2 is copied
-    strcpy(i1, intal1);                                             //this helps to free unwanted memory iteratively in a cleaner fashion
-    char *i2 = (char *)malloc((strlen(intal2) + 1) * sizeof(char));
-    strcpy(i2, intal2);
-    char *zero = (char *)malloc(2 * sizeof(char));
-    strcpy(zero, "0\0");
+    char *i1 = mallcopy(intal1); //intal1 and intal2 is copied                                            
+    char *i2 = mallcopy(intal2);//this helps to free unwanted memory iteratively in a cleaner fashion
+    char *zero = mallcopy("0\0");
     char *temp;
     while (intal_compare(i1, zero) == 1 && intal_compare(i2, zero) == 1) //loop proceedes when intal1 and intal2 are greater than zero
     {
@@ -481,6 +477,7 @@ int intal_search(char **arr, int n, const char *key) //linear search by traversi
         if (!intal_compare(arr[i], key))
             return i;
     }
+    return -1;
 }
 
 int intal_binsearch(char **arr, int n, const char *key) //binary search of sorted array
@@ -576,7 +573,7 @@ char *intal_bincoeff(unsigned int n, unsigned int k)
 
 char *rec_intal_bincoeff(unsigned int n, unsigned int k, char ***cube)
 {
-    char *result, *cpy;
+    char *result;
     if (cube[n][k] != NULL) //checking the 2D array if its value exists
     {
         result = cube[n][k];
@@ -585,8 +582,7 @@ char *rec_intal_bincoeff(unsigned int n, unsigned int k, char ***cube)
     {
         if (n == k || k == 0) // if k=0 or n==k, return 1
         {
-            result = (char *)malloc(2 * sizeof(char));
-            strcpy(result, "1\0");
+            result = mallcopy("1\0");
             cube[n][k] = result;
         }
         else
@@ -599,18 +595,14 @@ char *rec_intal_bincoeff(unsigned int n, unsigned int k, char ***cube)
             cube[n][k] = result;
         }
     }
-    cpy = (char *)malloc((strlen(result) + 1) * sizeof(char)); //copying so that memory in 2D array doesnt interfere with internal frees
-    strcpy(cpy, result);
-    return (cpy);
+    return mallcopy(result); //copying so that memory in 2D array doesnt interfere with internal frees
 }
 
 char *intal_pow(const char *intal1, unsigned int n) //power
 {
-    if (n == 0) //if n==0
+    if (n == 0) //if n==0,returns 1
     {
-        char *s = (char *)malloc(2 * sizeof(char));
-        strcpy(s, "1\0");
-        return s;
+        return mallcopy("1\0");
     }
     else
     {
@@ -635,17 +627,13 @@ char *coin_row_problem(char **arr, int n) //memory O(1)
 {
     if (n == 1) //if there exists only 1 coin
     {
-        char *s = (char *)malloc((strlen(arr[0]) + 1) * sizeof(char));
-        strcpy(s, arr[0]);
-        return s;
+        return mallcopy(arr[0]);
     }
     else if (n >= 2)
     {
-        char *val1 = (char *)malloc((strlen(arr[0]) + 1) * sizeof(char)); //max value for arr[0]
-        strcpy(val1, arr[0]);
+        char *val1 = mallcopy(arr[0]); //max value for arr[0]
         int max = intal_max(arr, 2);
-        char *val2 = (char *)malloc((strlen(arr[max]) + 1) * sizeof(char)); //max value for arr[0 to 1]
-        strcpy(val2, arr[max]);
+        char *val2 = mallcopy(arr[max]); //max value for arr[0 to 1]
         char *temp1, *temp2, *temp3; //pointers to store intermediate values
         //val1 and val2 are the pointers which store the values of dynamic programming
         for (int i = 2; i < n; i++)
@@ -671,49 +659,3 @@ char *coin_row_problem(char **arr, int n) //memory O(1)
         return val2;
     }
 }
-// the following function is the old_power function which accepted 2 strings
-//char *string_intal_pow(const char *intal1, const char *intal2)
-// {
-//     long int len = strlen(intal2);
-//     char *power = (char *)malloc(2 * sizeof(char));
-//     char *temp, *temp2;
-//     strcpy(power, "1\0");
-//     for (int i = 0; i < len; i++)
-//     {
-//         temp2 = looper(intal1, (int)(intal2[len - 1 - i]) - (int)('0'), i);
-//         temp = power;
-//         power = intal_multiply(temp2, power);
-//         free(temp);
-//         free(temp2);
-//     }
-//     return power;
-// }
-
-//the recursive function called by old_power
-// char *looper(const char *intal1, int val, long int place)
-// {
-//     char *res = (char *)malloc(2 * sizeof(char));
-//     char *temp, *temp2;
-//     strcpy(res, "1\0");
-//     if (place == 0)
-//     {
-//         for (int i = 0; i < val; i++)
-//         {
-//             temp = res;
-//             res = intal_multiply(intal1, res);
-//             free(temp);
-//         }
-//     }
-//     else
-//     {
-//         temp2 = looper(intal1, val, place - 1);
-//         for (int i = 0; i < 10; i++)
-//         {
-//             temp = res;
-//             res = intal_multiply(temp2, res);
-//             free(temp);
-//         }
-//         free(temp2);
-//     }
-//     return (res);
-// }
