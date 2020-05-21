@@ -19,17 +19,16 @@ typedef struct IntStore //head structure of doubly linked list
     Node *lsd; //least significant digit
 } IntStore;
 
-static IntStore *init_intstore();                                      //initialise DLL
-static Node *create_node(int);                                         //create node for DLL
-static void insert_intstore(IntStore *, Node *, int);                  //insert node into DLL
-static IntStore *string_to_intstore(const char *);                     //Intal string to DLL
-static char *intstore_to_string(IntStore *);                           //DLL to Intal string
-static void free_intstore(IntStore *);                                 //freeing DLL
-static int len_instore(IntStore *);                                    //len of intal number
-static char *single_multiply(const char *, int, int);                  //multiply an intal_string with single digit integer
-static void mergesort(char **, int, int);                              //mergesort for recursion
-static void merge_sortedhalves(char **, int, int, int);                //merging function for mergesort
-static char *rec_intal_bincoeff(unsigned int, unsigned int, char ***); //recursive function for binary coefficient
+static IntStore *init_intstore();                       //initialise DLL
+static Node *create_node(int);                          //create node for DLL
+static void insert_intstore(IntStore *, Node *, int);   //insert node into DLL
+static IntStore *string_to_intstore(const char *);      //Intal string to DLL
+static char *intstore_to_string(IntStore *);            //DLL to Intal string
+static void free_intstore(IntStore *);                  //freeing DLL
+static int len_instore(IntStore *);                     //len of intal number
+static char *single_multiply(const char *, int, int);   //multiply an intal_string with single digit integer
+static void mergesort(char **, int, int);               //mergesort for recursion
+static void merge_sortedhalves(char **, int, int, int); //merging function for mergesort
 static char *mallcopy(const char *source);
 
 static char *mallcopy(const char *source) //mallocs memory and copies string to it
@@ -548,25 +547,26 @@ void merge_sortedhalves(char **a, int start, int mid, int end) //merges to compo
 
 char *intal_bincoeff(unsigned int n, unsigned int k)
 {
-    char** strip=(char**)malloc((k+1)*sizeof(char*)); //dynamic memory array O(k)
-    for(long int i=0;i<=k;i++)
+    char **strip = (char **)malloc((k + 1) * sizeof(char *)); //dynamic memory array O(k), and array of length k+1 strings is used
+    for (long int i = 0; i <= k; i++)
     {
-        strip[i]=mallcopy("1\0");//initialised to 1
+        strip[i] = mallcopy("1\0"); //initialised to 1
     }
-    for(long int i=1;i<=(long int)n-(long int)k;i++)
+    //the corresponding loop builds up a skewed rectangle (n-k X k-1) of pascals relation
+    for (long int i = 1; i <= (long int)n - (long int)k; i++)
     {
-        for(long int j=1;j<=k;j++)
+        for (long int j = 1; j <= k; j++) //the subsequent elements are filled from left to right
         {
-            char* temp=strip[j];               
-            strip[j]=intal_add(strip[j],strip[j-1]);            
-            free(temp);           
+            char *temp = strip[j];
+            strip[j] = intal_add(strip[j], strip[j - 1]);
+            free(temp);
         }
     }
-    char* res=mallcopy(strip[k]);
-    for(long int i=0;i<=k;i++)
+    char *res = mallcopy(strip[k]);
+    for (long int i = 0; i <= k; i++)
     {
         free(strip[i]);
-    }    
+    }
     free(strip);
     return res;
 }
