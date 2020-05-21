@@ -548,51 +548,27 @@ void merge_sortedhalves(char **a, int start, int mid, int end) //merges to compo
 
 char *intal_bincoeff(unsigned int n, unsigned int k)
 {
-    char ***cube; //declares a n*k array of char*  (dynamic programming)
-    cube = (char ***)malloc((n + 1) * sizeof(char **));
-    for (unsigned int i = 0; i <= n; i++) //initialising all pointers to NULL
+    char** strip=(char**)malloc((k+1)*sizeof(char*)); //dynamic memory array O(k)
+    for(long int i=0;i<=k;i++)
     {
-        cube[i] = (char **)malloc((k + 1) * sizeof(char *));
-        for (unsigned int j = 0; j <= k; j++)
-            cube[i][j] = NULL;
+        strip[i]=mallcopy("1\0");//initialised to 1
     }
-    char *res = rec_intal_bincoeff(n, k, cube); //recursive function which uses Pascal's identity
-    for (unsigned int i = 0; i <= n; i++)       //freeing the 2D array
+    for(long int i=1;i<=(long int)n-(long int)k;i++)
     {
-        for (unsigned int j = 0; j <= k; j++)
-            if (cube[i][j])
-                free(cube[i][j]);
-        free(cube[i]);
-    }
-    free(cube);
-    return (res);
-}
-
-char *rec_intal_bincoeff(unsigned int n, unsigned int k, char ***cube)
-{
-    char *result;
-    if (cube[n][k] != NULL) //checking the 2D array if its value exists
-    {
-        result = cube[n][k];
-    }
-    else //else computing it
-    {
-        if (n == k || k == 0) // if k=0 or n==k, return 1
+        for(long int j=1;j<=k;j++)
         {
-            result = mallcopy("1\0");
-            cube[n][k] = result;
-        }
-        else
-        {
-            char *first = rec_intal_bincoeff(n - 1, k - 1, cube); //Pascal's identity recursive call
-            char *second = rec_intal_bincoeff(n - 1, k, cube);
-            result = intal_add(first, second);
-            free(first);
-            free(second);
-            cube[n][k] = result;
+            char* temp=strip[j];               
+            strip[j]=intal_add(strip[j],strip[j-1]);            
+            free(temp);           
         }
     }
-    return mallcopy(result); //copying so that memory in 2D array doesnt interfere with internal frees
+    char* res=mallcopy(strip[k]);
+    for(long int i=0;i<=k;i++)
+    {
+        free(strip[i]);
+    }    
+    free(strip);
+    return res;
 }
 
 char *intal_pow(const char *intal1, unsigned int n) //power
