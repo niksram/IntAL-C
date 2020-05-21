@@ -4,7 +4,7 @@
 #include "intal.h"
 #include <limits.h>
 
-//code tested on valgrind, no memory leaks found
+//code tested on valgrind, no memory errors or memory leaks found
 
 typedef struct Node //node structure of double linked list
 {
@@ -30,12 +30,12 @@ static char *single_multiply(const char *, int, int);                  //multipl
 static void mergesort(char **, int, int);                              //mergesort for recursion
 static void merge_sortedhalves(char **, int, int, int);                //merging function for mergesort
 static char *rec_intal_bincoeff(unsigned int, unsigned int, char ***); //recursive function for binary coefficient
-static char* mallcopy(const char* source);
+static char *mallcopy(const char *source);
 
-static char* mallcopy(const char* source)//mallocs memory and copies string to it
+static char *mallcopy(const char *source) //mallocs memory and copies string to it
 {
-    char* dest=(char*)malloc((strlen(source)+1)*sizeof(char));
-    strcpy(dest,source);
+    char *dest = (char *)malloc((strlen(source) + 1) * sizeof(char));
+    strcpy(dest, source);
     return dest;
 }
 
@@ -146,7 +146,7 @@ char *intstore_to_string(IntStore *istore) //convert DLL to string
         node = node->less;
         len++;
     }
-    char* s;
+    char *s;
     if (len != 0)
     {
         s = (char *)malloc((len + 1) * sizeof(char));
@@ -159,7 +159,7 @@ char *intstore_to_string(IntStore *istore) //convert DLL to string
     }
     else //if len=0, then 0 must be stored
     {
-        s=mallcopy("0\0");
+        s = mallcopy("0\0");
     }
     return (s);
 }
@@ -293,7 +293,7 @@ char *intal_diff(const char *intal1, const char *intal2)
     return s;
 }
 
-char *single_multiply(const char *intal1, int n, int offset) //multiply a intal string with 1 integer digit, offset is a parameter used to multiply by 10^offset
+char *single_multiply(const char *intal1, int n, int offset) //multiply a intal string with integers, offset is a parameter used to multiply by 10^offset
 {
     IntStore *istore1 = string_to_intstore(intal1);
     Node *n1 = istore1->lsd;
@@ -324,7 +324,7 @@ char *single_multiply(const char *intal1, int n, int offset) //multiply a intal 
 char *intal_multiply(const char *intal1, const char *intal2) //multiply  2 intal strings
 {
     IntStore *istore2 = string_to_intstore(intal2);
-    char *product = mallcopy("0\0"); //this pointer stores the product, initialised to 0                           
+    char *product = mallcopy("0\0"); //this pointer stores the product, initialised to 0
     long int count = 0;
     Node *n2 = istore2->lsd;
     while (n2)
@@ -401,7 +401,7 @@ char *intal_fibonacci(unsigned int n)
 
 char *intal_factorial(unsigned int n) // calls the power function
 {
-    char* s=mallcopy("1\0");
+    char *s = mallcopy("1\0");
     for (int i = 2; i <= n; i++)
     {
         char *temp = s;
@@ -413,8 +413,8 @@ char *intal_factorial(unsigned int n) // calls the power function
 
 char *intal_gcd(const char *intal1, const char *intal2)
 {
-    char *i1 = mallcopy(intal1); //intal1 and intal2 is copied                                            
-    char *i2 = mallcopy(intal2);//this helps to free unwanted memory iteratively in a cleaner fashion
+    char *i1 = mallcopy(intal1); //intal1 and intal2 is copied
+    char *i2 = mallcopy(intal2); //this helps to free unwanted memory iteratively in a cleaner fashion
     char *zero = mallcopy("0\0");
     char *temp;
     while (intal_compare(i1, zero) == 1 && intal_compare(i2, zero) == 1) //loop proceedes when intal1 and intal2 are greater than zero
@@ -488,8 +488,8 @@ int intal_binsearch(char **arr, int n, const char *key) //binary search of sorte
         {
             lower = mid + 1;
         }
-        else if (intal_compare(arr[mid], key) == 1)
-        {
+        else if (intal_compare(arr[mid], key) == 1 || (mid > 0 && intal_compare(arr[mid - 1], key) == 0)) //inorder to find 1st occurence of key
+        {                                                                                                 //if previous of mid is same as key, then the binary search should proceed towards the lower direction
             higher = mid - 1;
         }
         else
@@ -626,12 +626,12 @@ char *coin_row_problem(char **arr, int n) //memory O(1)
     {
         return mallcopy(arr[0]);
     }
-    else if (n >= 2)
+    else if (n > 1)
     {
         char *val1 = mallcopy(arr[0]); //max value for arr[0]
         int max = intal_max(arr, 2);
         char *val2 = mallcopy(arr[max]); //max value for arr[0 to 1]
-        char *temp1, *temp2, *temp3; //pointers to store intermediate values
+        char *temp1, *temp2, *temp3;     //pointers to store intermediate values
         //val1 and val2 are the pointers which store the values of dynamic programming
         for (int i = 2; i < n; i++)
         {
@@ -654,5 +654,9 @@ char *coin_row_problem(char **arr, int n) //memory O(1)
         }
         free(val1);
         return val2;
+    }
+    else
+    {
+        return NULL;
     }
 }
