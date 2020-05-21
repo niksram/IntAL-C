@@ -1,4 +1,4 @@
-GFLAGS=-g
+GFLAGS=
 
 a.out: intal_sampletest.o PES1201801972.o
 	gcc $(GFLAGS) PES1201801972.o intal_sampletest.o
