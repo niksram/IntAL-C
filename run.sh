@@ -1,3 +1,3 @@
 make
-./a.out
+valgrind ./a.out
 make clean

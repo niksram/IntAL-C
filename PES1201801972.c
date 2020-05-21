@@ -342,6 +342,10 @@ char *intal_multiply(const char *intal1, const char *intal2) //multiply  2 intal
 char *intal_mod(const char *intal1, const char *intal2)
 {
     //here, i have implemented another method to improve the efficiency of mod
+    char* zero=mallcopy("0\0");
+    if(!intal_compare(zero,intal2)) //for safety
+        return zero;
+    free(zero);
     IntStore *istore1 = string_to_intstore(intal1); //creating the IntStore DLL for the strings
     IntStore *istore2 = string_to_intstore(intal2); //the reason this is created is a safety to strip zeros at the msd side
     char *i1 = intstore_to_string(istore1);
@@ -351,7 +355,7 @@ char *intal_mod(const char *intal1, const char *intal2)
     int len;
     while (intal_compare(i1, i2) != -1)
     {
-        //here,  0 is append to the smaller number until its 'just' smaller than number ('just'-an additional append shall result in a greater number)
+        //here,  0 is append to the smaller number until its 'just' smaller than number ('just' an additional append shall result in a greater number)
         //Regarding this approach, we had mailed to you, and you had validated this approach.
         if (i1[0] > i2[0])                 //to check whether the msd of intal1 number is greater than msd of intal2
             len = strlen(i1) - strlen(i2); //len given the number of zeros that can be appended
@@ -412,8 +416,12 @@ char *intal_factorial(unsigned int n) // calls the power function
 
 char *intal_gcd(const char *intal1, const char *intal2)
 {
-    char *i1 = mallcopy(intal1); //intal1 and intal2 is copied
-    char *i2 = mallcopy(intal2); //this helps to free unwanted memory iteratively in a cleaner fashion
+    IntStore* istore1=string_to_intstore(intal1);
+    IntStore* istore2=string_to_intstore(intal2);
+    char *i1 = intstore_to_string(istore1); //intal1 and intal2 is copied through intstore to strip trailing zeros (for safety)
+    char *i2 = intstore_to_string(istore2); //this also helps to free unwanted memory iteratively in a cleaner fashion
+    free_intstore(istore1);
+    free_intstore(istore2);
     char *zero = mallcopy("0\0");
     char *temp;
     while (intal_compare(i1, zero) == 1 && intal_compare(i2, zero) == 1) //loop proceedes when intal1 and intal2 are greater than zero
@@ -547,6 +555,10 @@ void merge_sortedhalves(char **a, int start, int mid, int end) //merges to compo
 
 char *intal_bincoeff(unsigned int n, unsigned int k)
 {
+    if(k==0)
+        return mallcopy("0\0");
+    if(k>n/2)
+        k=n-k;
     char **strip = (char **)malloc((k + 1) * sizeof(char *)); //dynamic memory array O(k), and array of length k+1 strings is used
     for (long int i = 0; i <= k; i++)
     {

@@ -88,27 +88,27 @@ int main(int argc, char const *argv[])
     //     printf("%s*%s=%s\n", a, b, result1);
     //     free(result1);
     // }
-    // {
-    //     char *a = "0";
-    //     char *b = "887";
-    //     result1 = intal_mod(a, b);
-    //     printf("%s mod %s=%s\n", a, b, result1);
-    //     free(result1);
-    // }
+    {
+        char *a = "887";
+        char *b = "0";
+        result1 = intal_mod(a, b);
+        printf("%s mod %s=%s\n", a, b, result1);
+        free(result1);
+    }
     {
         char *a = "2";
-        int b = 100000;
+        int b = 100;
         result1 = intal_pow(a, b);
         printf("%s^%d=%s\n", a, b, result1);
         free(result1);
     }
-    // {
-    //     char *a = "3274618723468127364";
-    //     char *b = "23897614987613294876";
-    //     result1 = intal_gcd(a, b);
-    //     printf("gcd(%s,%s)=%s\n", a, b, result1);
-    //     free(result1);
-    // }
+    {
+        char *a = "3274618723468127364";
+        char *b = "0003274618723468127364";
+        result1 = intal_gcd(a, b);
+        printf("gcd(%s,%s)=%s\n", a, b, result1);
+        free(result1);
+    }
     // {
     //     int n = 30000;
     //     result1 = intal_fibonacci(n);
