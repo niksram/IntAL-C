@@ -1,0 +1,66 @@
+INTRODUCTION
+
+1)
+
+a)
+
+Intal is a library for C which can be used to perform arithmatic operations on very large whole numbers in the order
+of 10^1000 (and more). It provides a standard set of functions which support closure property within whole numbers.
+The largest possible fundamental datatype in C which can store whole numbers (n>=0) is unsigned long long int which can store
+ a maximum value = 18,446,744,073,709,551,615 (20-digits). In order to perform operations on larger numbers (of the order 1000 digits),
+Intal stores and processes the numbers as is in the form of a character array (string). In its fundamental operations (like add, subtract,
+multiply, compare) intal functions convert string to a doubly-linked-list and computes the intricate intermediate results. Intal also provides some 
+functions which grow at a very fast rate w.r.t input (like power, factorial, binomial-coefficient) and hence fundamental data-types
+can generate results only for small input.
+
+2)
+
+intal_add -> the 2 strings are converted to doubly-linked-lists (each node with a digit in its place value).
+The sum doubly linked list is computed by adding the nodes with respect to place value and is then converted back to string.
+
+intal_compare -> converts the number to DLL hence stripping off trailing zeros if any. Then first the length if the DLL is compared to find
+if one input string is greater than the other. If they are of same length, the digit by digit comparison is started from (most significant digit).
+
+intal_diff -> first the larger of the 2 numbers are determined using intal_compare else 0 is returned.
+Then the smaller number is subtracted from larger number from lsd side. If the value of the digit turns out to be negative,
+a borrow is done from the succesive digit.
+
+intal_multiply -> this function multiplies the first input with the second input digit-by-digit. the digit-by-digit multiplication
+is done in the single_multiply function and offset is passed to shift the partial sum to its respective place. These values are added
+
+intal_mod -> This function finds mod in an efficient manner. In a % b, the value b is shifted to left in the order of 10 using
+offset parameter in single_multiply until its just smaller than a (just appends zeros). This value is then subtracted from a.
+This is done until a<b.
+
+intal_pow -> for n^k, first recursive call determined z=n^(k/2). if k is even, result = z*z
+else result = k*k*2
+
+intal_gcd -> until one of the numbers is zero, the following action is done
+larger_val=larger_val%smaller_val
+
+intal_fibonacci -> fibonacci of 0 and 1 is stored as 0 and 1. then recursive action f(n)=f(n-1)+f(n-2)
+is followed until resuly is found
+
+intal_factorial -> fact(n) , a loop is run n times. result initially is contains "1"
+Then, in the loop for i=2 to n, result = single_multiply(result,i,0). single multiply multiplies int with intal string
+
+intal_max, intal_min -> both these functions traverse the array linearly and finds the index of max, min intal string respectively
+
+intal_search -> traverses linearly and finds the index of first occurence of the key, else returns -1
+
+intal_binsearch -> the function needs to find first occurence using binary search. given a sorted array, mid index is computed.
+If value at mid is lesser than key, the lower_boundary=mid+1
+else if value at mid id greater than key, upper_boundary=mid-1
+else if value at mid=key and value at mid-1=key (when mid>0) then again upper_boundary=mid-1
+loop runs until upper-lower>=0, else returns -1
+
+coin_row_problem -> if array size=1, return the value. if size >=2 then optimum value for arr[0 ->0] and arr[0->1] is computed.
+then recursive series max(arr[0 to n-2]+arr[n],arr[0 to n-1]) is found by traversing down. hence 2 pointers are used to store the value.
+
+3)
+ 
+The current library works flawlessly for arbitrary length with respect to all the functions but is slow when computing for
+extremely large values like 2^100000, fibonacci(100000), etc. Hence my primary work should be in making the functions more efficient.
+Next effort could be put into incorporating -ve numbers which could be maintained with a flag in the DLL. 
+The far-fetched approach would be to incorporate decimal numbers. This must be done by maintinaing 2 separate linked lists for 
+the integral part and decimal part.

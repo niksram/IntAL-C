@@ -1,3 +1,3 @@
 make
-valgrind ./a.out
+time ./a.out
 make clean
