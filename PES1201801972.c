@@ -555,7 +555,7 @@ void merge_sortedhalves(char **a, int start, int mid, int end) //merges to compo
 
 char *intal_bincoeff(unsigned int n, unsigned int k)
 {
-    if(k==0 || k>n) //safety case
+    if(k>n) //safety case
         return mallcopy("0\0");
     if(k>n/2)
         k=n-k;
