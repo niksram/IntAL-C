@@ -89,7 +89,7 @@ int main(int argc, char const *argv[])
     //     free(result1);
     // }
     {
-        char *a = "0";
+        char *a = "100";
         char *b = "0";
         result1 = intal_mod(a, b);
         printf("%s mod %s=%s\n", a, b, result1);
@@ -97,14 +97,14 @@ int main(int argc, char const *argv[])
     }
     {
         char *a = "2";
-        int b = 100;
+        int b = 1000;
         result1 = intal_pow(a, b);
         printf("%s^%d=%s\n", a, b, result1);
         free(result1);
     }
     {
-        char *a = "3274618723468127364";
-        char *b = "0003274618723468127364";
+        char *a = "0";
+        char *b = "10";
         result1 = intal_gcd(a, b);
         printf("gcd(%s,%s)=%s\n", a, b, result1);
         free(result1);
@@ -121,13 +121,13 @@ int main(int argc, char const *argv[])
     //     printf("fact(%d)=%s\n", n, result1);
     //     free(result1);
     // }
-    {
-        int a = 200000;
-        int b = 10;
-        result1 = intal_bincoeff(a, b);
-        printf("C(%d,%d)=%s\n", a, b, result1);
-        free(result1);
-    }
+    // {
+    //     int a = 200000;
+    //     int b = 10;
+    //     result1 = intal_bincoeff(a, b);
+    //     printf("C(%d,%d)=%s\n", a, b, result1);
+    //     free(result1);
+    // }
     // {
     //     int a = 100;
     //     result1 = intal_bincoeff(a, b);
