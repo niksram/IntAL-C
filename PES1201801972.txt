@@ -2,16 +2,14 @@ INTRODUCTION
 
 1)
 
-a)
-
 Intal is a library for C which can be used to perform arithmatic operations on very large whole numbers in the order
 of 10^1000 (and more). It provides a standard set of functions which support closure property within whole numbers.
 The largest possible fundamental datatype in C which can store whole numbers (n>=0) is unsigned long long int which can store
  a maximum value = 18,446,744,073,709,551,615 (20-digits). In order to perform operations on larger numbers (of the order 1000 digits),
-Intal stores and processes the numbers as is in the form of a character array (string). In its fundamental operations (like add, subtract,
+Intal numbers are stored and processed in the numbers in the form of a character array (string). In its fundamental operations (like add, subtract,
 multiply, compare) intal functions convert string to a doubly-linked-list and computes the intricate intermediate results. Intal also provides some 
-functions which grow at a very fast rate w.r.t input (like power, factorial, binomial-coefficient) and hence fundamental data-types
-can generate results only for small input.
+functions which grow at a very fast rate w.r.t of input (like power, factorial, binomial-coefficient) for which fundamental data-types
+can be used to generate results only for small input.
 
 2)
 
@@ -33,7 +31,7 @@ offset parameter in single_multiply until its just smaller than a (just appends 
 This is done until a<b.
 
 intal_pow -> for n^k, first recursive call determined z=n^(k/2). if k is even, result = z*z
-else result = k*k*2
+else result = z*z*2
 
 intal_gcd -> until one of the numbers is zero, the following action is done
 larger_val=larger_val%smaller_val
@@ -54,6 +52,9 @@ else if value at mid id greater than key, upper_boundary=mid-1
 else if value at mid=key and value at mid-1=key (when mid>0) then again upper_boundary=mid-1
 loop runs until upper-lower>=0, else returns -1
 
+intal_sort -> merge sort is used to to sort the intal strings in O(log n) complexity. The mergesort function is used to split the array
+into smaller parts recursively. MergeSorted Halves merges the parts in non-descending order.
+
 coin_row_problem -> if array size=1, return the value. if size >=2 then optimum value for arr[0 ->0] and arr[0->1] is computed.
 then recursive series max(arr[0 to n-2]+arr[n],arr[0 to n-1]) is found by traversing down. hence 2 pointers are used to store the value.
 
@@ -62,5 +63,5 @@ then recursive series max(arr[0 to n-2]+arr[n],arr[0 to n-1]) is found by traver
 The current library works flawlessly for arbitrary length with respect to all the functions but is slow when computing for
 extremely large values like 2^100000, fibonacci(100000), etc. Hence my primary work should be in making the functions more efficient.
 Next effort could be put into incorporating -ve numbers which could be maintained with a flag in the DLL. 
-The far-fetched approach would be to incorporate decimal numbers. This must be done by maintinaing 2 separate linked lists for 
+The far-fetched approach would be to incorporate decimal numbers. This could be done by maintinaing 2 separate linked lists for 
 the integral part and decimal part.
